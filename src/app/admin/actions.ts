@@ -32,7 +32,7 @@ export async function createGlobalWorkout(
 
   if (!validation.success) {
     return {
-      error: validation.error.errors.map((e) => e.message).join(", "),
+      error: validation.error.issues.map((e) => e.message).join(", "),
     };
   }
 
@@ -49,14 +49,17 @@ export async function createGlobalWorkout(
   }
 
   // Insert data into workouts table with is_global = true
-  const { error: insertError } = await supabase.from("workouts").insert({
-    title: validation.data.title,
-    difficulty: validation.data.difficulty,
-    duration_minutes: validation.data.duration,
-    description: validation.data.description || null,
-    user_id: user.id,
-    is_global: true,
-  });
+  const { error: insertError } = await supabase
+    .from("workouts")
+    // @ts-expect-error - Supabase types are generic and don't include specific table schemas
+    .insert({
+      title: validation.data.title,
+      difficulty: validation.data.difficulty,
+      duration_minutes: validation.data.duration,
+      description: validation.data.description || null,
+      user_id: user.id,
+      is_global: true,
+    });
 
   if (insertError) {
     return { error: insertError.message };
@@ -106,7 +109,7 @@ export async function publishIntel(
 
   if (!validation.success) {
     return {
-      error: validation.error.errors.map((e) => e.message).join(", "),
+      error: validation.error.issues.map((e) => e.message).join(", "),
     };
   }
 
@@ -138,15 +141,18 @@ export async function publishIntel(
   }
 
   // Insert into articles table
-  const { error: insertError } = await supabase.from("articles").insert({
-    title: validation.data.title,
-    slug,
-    category: validation.data.category,
-    summary: validation.data.summary || null,
-    content: validation.data.content,
-    security_level: validation.data.security_level,
-    author_id: user.id,
-  });
+  const { error: insertError } = await supabase
+    .from("articles")
+    // @ts-expect-error - Supabase types are generic and don't include specific table schemas
+    .insert({
+      title: validation.data.title,
+      slug,
+      category: validation.data.category,
+      summary: validation.data.summary || null,
+      content: validation.data.content,
+      security_level: validation.data.security_level,
+      author_id: user.id,
+    });
 
   if (insertError) {
     // Handle unique constraint violation
@@ -193,6 +199,7 @@ export async function updateUserTier(
   // Update profile tier
   const { error: updateError } = await supabase
     .from("profiles")
+    // @ts-expect-error - Supabase types are generic and don't include specific table schemas
     .update({ tier: newTier })
     .eq("id", userId);
 
