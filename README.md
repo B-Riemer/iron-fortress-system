@@ -12,7 +12,7 @@
 
 ## 🌐 LIVE DEPLOYMENT
 
-**[>> INITIATE SYSTEM ACCESS (LIVE DEMO)](https://iron-fortress-system-nlt7shuam-br-devs-projects.vercel.app) ** *(Klicken für Live-Ansicht)*
+**[>> INITIATE SYSTEM ACCESS (LIVE DEMO)](https://iron-fortress-system.vercel.app) ** *(Klicken für Live-Ansicht)*
 ## 🔐 CLASSIFIED ACCESS CODES (DEMO CREDENTIALS)
 
 Nutzen Sie diese Zugangsdaten, um das System zu testen:
