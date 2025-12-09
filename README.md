@@ -1,36 +1,83 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 🛡️ IRON FORTRESS | HIGH-PERFORMANCE COACHING SYSTEM
 
-## Getting Started
+![Project Status](https://img.shields.io/badge/STATUS-OPERATIONAL-emerald?style=for-the-badge&logo=vercel)
+![Security Clearance](https://img.shields.io/badge/CLEARANCE-TOP_SECRET-zinc?style=for-the-badge)
+![Tech Stack](https://img.shields.io/badge/CORE-NEXT.JS_16-black?style=for-the-badge&logo=next.js)
 
-First, run the development server:
+> **"Standard fitness is broken. This is a digital fortress."**
+> 
+> Eine voll funktionsfähige SaaS-Architektur für High-Ticket Military Fitness Coaching. Entwickelt mit Fokus auf Skalierbarkeit, Sicherheit und kompromisslose UX.
+
+---
+
+## 🌐 LIVE DEPLOYMENT
+
+**[>> INITIATE SYSTEM ACCESS (LIVE DEMO)]iron-fortress-system-git-portfolio-br-devs-projects.vercel.app** *(Klicken für Live-Ansicht)*
+
+---
+
+## ⚡ THE ARSENAL (TECH STACK)
+
+Dieses System nutzt "Bleeding Edge" Technologien für maximale Performance:
+
+* **Core:** Next.js 16 (App Router, Server Components)
+* **Language:** TypeScript (Strict Mode)
+* **Styling:** Tailwind CSS v4 (Zero-Runtime, Military-Grade Design System)
+* **Database & Auth:** Supabase (PostgreSQL, Row Level Security)
+* **Payment:** Stripe Integration (Webhooks, Subscription Management)
+* **Animation:** Framer Motion (Kinetic UI)
+* **Validation:** Zod (Type-safe Schema Validation)
+
+---
+
+## 🎯 KEY OPERATIONS (FEATURES)
+
+### 1. DYNAMIC CLEARANCE LEVELS (RBAC)
+Ein datenbankgestütztes Berechtigungssystem steuert den Zugriff auf Inhalte.
+* **RECRUIT (Free):** Eingeschränkter Zugriff, Public Intel.
+* **OPERATOR (Subscription):** Vollzugriff auf globale Protokolle (via Stripe Payment automatisiert).
+* **SHADOW (VIP):** Exklusive 1:1 Coaching Bereiche.
+
+### 2. TACTICAL COMMAND CENTER (DASHBOARD)
+* **Workout Engine:** Interaktiver "Field Mode" für das Training im Gym (Mobile-First, Timer, Checkbox-Logic).
+* **Intel Database:** Ein Wiki-System für gesicherte Inhalte (verschwommene/gesperrte Artikel für niedrige Ränge).
+* **System Settings:** Profilverwaltung im "Identity Card" Look.
+
+### 3. THE "GOD MODE" (ADMIN PANEL)
+Versteckter Bereich (`/admin`) zur Steuerung des gesamten Ökosystems:
+* **Protocol Deployment:** Erstellen und Zuweisen von globalen Trainingsplänen an alle User.
+* **User Management:** Manuelles Befördern/Degradieren von Usern.
+* **Intel Publication:** CMS für Blog-Artikel und Guides.
+
+---
+
+## 📸 MISSION REPORTS (SCREENSHOTS)
+
+*(Hier können später Screenshots eingefügt werden)*
+
+| Landing Page | Command Center |
+|:---:|:---:|
+| ![Landing](public/assets/landing-preview.jpg) | ![Dashboard](public/assets/dashboard-preview.jpg) |
+
+---
+
+## 🚀 DEPLOYMENT PROTOCOL
+
+Um dieses System lokal zu starten:
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+# 1. Clone Repository
+git clone [https://github.com/B-Riemer/iron-fortress-system.git](https://github.com/B-Riemer/iron-fortress-system.git)
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+# 2. Install Dependencies
+pnpm install
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+# 3. Environment Setup
+# Erstelle eine .env.local Datei mit Supabase & Stripe Keys
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+# 4. Initiate Launch Sequence
+pnpm run dev
 
-## Learn More
+Architect: B. Riemer
 
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Built for: Portfolio Showcase
