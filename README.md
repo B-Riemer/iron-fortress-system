@@ -13,7 +13,16 @@
 ## 🌐 LIVE DEPLOYMENT
 
 **[>> INITIATE SYSTEM ACCESS (LIVE DEMO)]iron-fortress-system-git-portfolio-br-devs-projects.vercel.app** *(Klicken für Live-Ansicht)*
+## 🔐 CLASSIFIED ACCESS CODES (DEMO CREDENTIALS)
 
+Nutzen Sie diese Zugangsdaten, um das System zu testen:
+
+| Role | Clearance | Email | Password |
+| :--- | :--- | :--- | :--- |
+| **USER** | OPERATOR (Level 2) | `charly@tester.com` | `test123` |
+| **ADMIN** | GOD MODE | `admin@ironfortress.com` | `admin123` |
+
+> **Hinweis:** Dies ist eine Live-Demo. Stripe läuft im **Test-Modus** (Nutzen Sie `4242 4242 4242 4242` für Zahlungen).
 ---
 
 ## ⚡ THE ARSENAL (TECH STACK)
