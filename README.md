@@ -57,7 +57,7 @@ Versteckter Bereich (`/admin`) zur Steuerung des gesamten Ökosystems:
 
 | Landing Page | Command Center |
 |:---:|:---:|
-| ![Landing](public/assets/landing-preview.jpg) | ![Dashboard](public/assets/dashboard-preview.jpg) |
+| ![Landing](https://github.com/B-Riemer/iron-fortress-system/blob/portfolio/public/assets/landing-preview.jpg?raw=true) | ![Dashboard](https://github.com/B-Riemer/iron-fortress-system/blob/portfolio/public/assets/dashboard-preview.jpg?raw=true) |
 
 ---
 
