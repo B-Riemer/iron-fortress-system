@@ -1,92 +1,189 @@
-# 🛡️ IRON FORTRESS | HIGH-PERFORMANCE COACHING SYSTEM
+# 🛡️ Iron Fortress
 
-![Project Status](https://img.shields.io/badge/STATUS-OPERATIONAL-emerald?style=for-the-badge&logo=vercel)
-![Security Clearance](https://img.shields.io/badge/CLEARANCE-TOP_SECRET-zinc?style=for-the-badge)
-![Tech Stack](https://img.shields.io/badge/CORE-NEXT.JS_16-black?style=for-the-badge&logo=next.js)
+**A subscription SaaS built end-to-end: Supabase auth, tier-based access control, and a working Stripe billing loop.**
 
-> **"Standard fitness is broken. This is a digital fortress."**
-> 
-> Eine voll funktionsfähige SaaS-Architektur für High-Ticket Military Fitness Coaching. Entwickelt mit Fokus auf Skalierbarkeit, Sicherheit und kompromisslose UX.
+![Status](https://img.shields.io/badge/status-live%20demo-10b981?style=flat-square)
+![Next.js](https://img.shields.io/badge/Next.js-16-000000?style=flat-square&logo=next.js)
+![TypeScript](https://img.shields.io/badge/TypeScript-strict-3178C6?style=flat-square&logo=typescript)
+![Supabase](https://img.shields.io/badge/Supabase-RLS-3FCF8E?style=flat-square&logo=supabase)
+![Stripe](https://img.shields.io/badge/Stripe-test%20mode-635BFF?style=flat-square&logo=stripe)
+
+> A high-ticket military-fitness coaching platform. The theme is deliberate — the point of the project was to build the *unglamorous* parts of a SaaS properly: session handling, a paid tier that a webhook actually grants, and an admin surface that isn't just a hidden route.
+
+**▶ Live demo: [iron-fortress-system.vercel.app](https://iron-fortress-system.vercel.app)**
 
 ---
 
-## 🌐 LIVE DEPLOYMENT
+## Try it
 
-**[>> INITIATE SYSTEM ACCESS (LIVE DEMO)](https://iron-fortress-system.vercel.app) ** *(Klicken für Live-Ansicht)*
-## 🔐 CLASSIFIED ACCESS CODES (DEMO CREDENTIALS)
-
-Nutzen Sie diese Zugangsdaten, um das System zu testen:
+Stripe runs in **test mode** — use card `4242 4242 4242 4242`, any future expiry, any CVC.
 
 | Role | Clearance | Email | Password |
-| :--- | :--- | :--- | :--- |
-| **USER** | OPERATOR (Level 2) | `charly@tester.com` | `test123` |
-| **ADMIN** | GOD MODE | `admin@ironfortress.com` | `admin123` |
+|---|---|---|---|
+| User | OPERATOR (Level 1) | `charly@tester.com` | `test123` |
+| Admin | Level 2 | `admin@ironfortress.com` | `admin123` |
 
-> **Hinweis:** Dies ist eine Live-Demo. Stripe läuft im **Test-Modus** (Nutzen Sie `4242 4242 4242 4242` für Zahlungen).
----
-
-## ⚡ THE ARSENAL (TECH STACK)
-
-Dieses System nutzt "Bleeding Edge" Technologien für maximale Performance:
-
-* **Core:** Next.js 16 (App Router, Server Components)
-* **Language:** TypeScript (Strict Mode)
-* **Styling:** Tailwind CSS v4 (Zero-Runtime, Military-Grade Design System)
-* **Database & Auth:** Supabase (PostgreSQL, Row Level Security)
-* **Payment:** Stripe Integration (Webhooks, Subscription Management)
-* **Animation:** Framer Motion (Kinetic UI)
-* **Validation:** Zod (Type-safe Schema Validation)
+*These are seeded demo accounts on a throwaway project. Nothing real lives behind them.*
 
 ---
 
-## 🎯 KEY OPERATIONS (FEATURES)
+## What this project demonstrates
 
-### 1. DYNAMIC CLEARANCE LEVELS (RBAC)
-Ein datenbankgestütztes Berechtigungssystem steuert den Zugriff auf Inhalte.
-* **RECRUIT (Free):** Eingeschränkter Zugriff, Public Intel.
-* **OPERATOR (Subscription):** Vollzugriff auf globale Protokolle (via Stripe Payment automatisiert).
-* **SHADOW (VIP):** Exklusive 1:1 Coaching Bereiche.
-
-### 2. TACTICAL COMMAND CENTER (DASHBOARD)
-* **Workout Engine:** Interaktiver "Field Mode" für das Training im Gym (Mobile-First, Timer, Checkbox-Logic).
-* **Intel Database:** Ein Wiki-System für gesicherte Inhalte (verschwommene/gesperrte Artikel für niedrige Ränge).
-* **System Settings:** Profilverwaltung im "Identity Card" Look.
-
-### 3. THE "GOD MODE" (ADMIN PANEL)
-Versteckter Bereich (`/admin`) zur Steuerung des gesamten Ökosystems:
-* **Protocol Deployment:** Erstellen und Zuweisen von globalen Trainingsplänen an alle User.
-* **User Management:** Manuelles Befördern/Degradieren von Usern.
-* **Intel Publication:** CMS für Blog-Artikel und Guides.
+1. **A billing loop that closes.** Checkout → Stripe → signed webhook → database tier change → gated content. Most portfolio SaaS projects stop at the pricing page; this one carries a `userId` through Stripe metadata and back.
+2. **Authorization as a data concern, not a routing concern.** Access is decided server-side and backed by Postgres Row Level Security, rather than by hiding links in the UI.
+3. **Next.js 16 App Router in anger.** Server Components for data, Server Actions for mutations, middleware kept deliberately thin.
 
 ---
 
-## 📸 MISSION REPORTS (SCREENSHOTS)
+## Architecture
 
-*(Hier können später Screenshots eingefügt werden)*
+```mermaid
+flowchart TD
+    B["Browser"] -->|"cookie session"| MW["middleware.ts<br/>refresh session only"]
+    MW --> RSC["Server Components<br/>marketing / dashboard / admin"]
+    RSC -->|"anon key + RLS"| DB[("Supabase Postgres")]
+    RSC --> SA["Server Actions<br/>actions.ts"]
+    SA -->|"anon key + RLS"| DB
+    B -->|"POST /api/stripe/checkout"| CO["Checkout route<br/>metadata.userId"]
+    CO --> ST["Stripe Checkout"]
+    ST -->|"signed webhook"| WH["/api/stripe/webhook"]
+    WH -->|"service-role key<br/>bypasses RLS"| DB
+```
 
-| Landing Page | Command Center |
-|:---:|:---:|
-| ![Landing](https://github.com/B-Riemer/iron-fortress-system/blob/portfolio/public/assets/landing-preview.jpg?raw=true) | ![Dashboard](https://github.com/B-Riemer/iron-fortress-system/blob/portfolio/public/assets/dashboard-preview.jpg?raw=true) |
+### The three decisions worth explaining
+
+**1. Middleware refreshes the session. It does not authorize.**
+
+`src/middleware.ts` runs `supabase.auth.getUser()` to keep the SSR cookie session fresh, and redirects logged-in users away from `/login`. That's all it does.
+
+It would have been shorter to put route guards in middleware. I didn't, because middleware runs before the request reaches the data layer, and a guard there controls what a user *may see*, not what they *may read*. Authorization instead lives in two places that actually touch data: server components (`verifyAdmin()` in `src/app/admin/layout.tsx`) and RLS policies in Postgres. If a query slips past the UI, the database still says no.
+
+**2. Stripe and Supabase are bridged by `metadata.userId`.**
+
+Stripe knows about customers; Supabase knows about users. Nothing links them by default. The checkout route (`src/app/api/stripe/checkout/route.ts`) writes the Supabase user id into the session metadata:
+
+```ts
+metadata: { userId: user.id }   // the bridge to the webhook
+```
+
+The webhook reads it back, verifies the signature with `stripe.webhooks.constructEvent`, and promotes the profile using a **service-role client** — the one place in the codebase that deliberately bypasses RLS, because a webhook has no user session to act on behalf of.
+
+The trade-off: the downgrade path (`customer.subscription.deleted`) has no `userId` in scope, so it resolves the user by looking up the Stripe customer's **email**. That works, and it is the weakest link in the design — see *Known limitations*.
+
+**3. Clearance is an ordered enum, not a boolean.**
+
+```ts
+export const CLEARANCE_LEVELS = { RECRUIT: 0, OPERATOR: 1, SHADOW: 2 } as const;
+```
+
+Comparing integers (`userLevel < requiredLevel`) means adding a tier later is a data change, not a code change. Workouts carry a `required_tier` column, so content gates itself.
+
+### Data model
+
+| Table | Purpose | Notable columns |
+|---|---|---|
+| `profiles` | Mirrors `auth.users`, holds the paid tier | `id`, `email`, `tier` |
+| `workouts` | Training protocols, global or user-owned | `is_global`, `required_tier`, `difficulty`, `duration_minutes` |
+| `workout_logs` | Completion history, drives the activity chart | `workout_id`, `created_at` |
+| `articles` | Gated wiki/CMS content | `slug`, `category`, `security_level`, `author_id` |
 
 ---
 
-## 🚀 DEPLOYMENT PROTOCOL
+## Tech stack
 
-Um dieses System lokal zu starten:
+| Layer | Choice | Why |
+|---|---|---|
+| Framework | Next.js 16 (App Router) | Server Components keep auth-sensitive data on the server |
+| Language | TypeScript, strict | — |
+| UI | React 19 + React Compiler | Compiler removes most manual `useMemo`/`useCallback` |
+| Styling | Tailwind CSS v4 | Zero-runtime; no CSS-in-JS cost on a content-heavy dashboard |
+| Data / Auth | Supabase (Postgres + RLS) | Auth and authorization in one system, enforced at the row |
+| Payments | Stripe Checkout + webhooks | Hosted checkout keeps card data entirely out of scope |
+| Validation | Zod | Runtime validation at trust boundaries |
+| Motion | Framer Motion | — |
+
+---
+
+## Known limitations
+
+Written down because they're real, and because I'd rather discuss them than have them found.
+
+- **The tier simulator overrides the real tier.** `src/components/debug/tier-switcher.tsx` writes a client-side `simulated_tier` cookie, and `dashboard/training/page.tsx` reads it with *priority over* the database value. Anyone can set that cookie in devtools and see gated workouts. It was built as a development affordance and shipped to the demo. It should be gated behind `NODE_ENV !== "production"`, and the DB value should win.
+- **The paywall is presentational.** The training query fetches every eligible row and computes an `isLocked` flag for the UI, so the content of a locked workout is already in the payload. Real enforcement belongs in an RLS policy or a filtered query, not in a render branch.
+- **Admin is a single hard-coded email.** `verifyAdmin()` compares `user.email` against `NEXT_PUBLIC_ADMIN_EMAIL`. The check itself is server-side and sound, but the `NEXT_PUBLIC_` prefix ships the admin address in the client bundle, and there is exactly one admin. This should be a role column or a JWT claim.
+- **The webhook is not idempotent.** Stripe retries on non-2xx. There's no `event.id` ledger, so a retry re-applies the tier update. Harmless here because the update is idempotent by value, but the pattern doesn't generalise.
+- **Subscription cancellation matches on email.** If a user changes their address in Stripe or Supabase, the downgrade silently misses. The fix is to persist `stripe_customer_id` on `profiles` at checkout.
+- **Only two webhook events are handled.** `invoice.payment_failed`, `customer.subscription.updated` and `past_due` dunning states are unhandled — a failing card keeps its access.
+- **The `SHADOW` tier has no self-serve path.** Only `STRIPE_PRICE_ID_OPERATOR` exists; SHADOW is admin-assigned.
+- **`src/types/supabase.ts` is a stub, not generated.** It's a permissive `Record<string, unknown>` index signature, so Supabase queries type-check against nothing. Running `supabase gen types typescript` would surface real errors.
+- **The schema lives in the Supabase dashboard, not in the repo.** There are no versioned migrations, so this repo is not reproducible from a clean project.
+- **No automated tests.**
+
+---
+
+## Roadmap
+
+- [ ] Gate `TierSwitcher` on `NODE_ENV`, and make the DB tier authoritative
+- [ ] Move the paywall into RLS so locked content never leaves Postgres
+- [ ] Persist `stripe_customer_id`; drop the email lookup
+- [ ] Add a `stripe_events` table for webhook idempotency
+- [ ] Handle `payment_failed` / `subscription.updated`
+- [ ] Replace the env-var admin with a `role` column and an RLS policy
+- [ ] Check in `supabase/migrations/` and generate real DB types
+- [ ] Playwright coverage for the signup → checkout → unlock path
+
+---
+
+## Running locally
 
 ```bash
-# 1. Clone Repository
-git clone [https://github.com/B-Riemer/iron-fortress-system.git](https://github.com/B-Riemer/iron-fortress-system.git)
-
-# 2. Install Dependencies
+git clone https://github.com/B-Riemer/iron-fortress-system.git
+cd iron-fortress-system
 pnpm install
+pnpm dev
+```
 
-# 3. Environment Setup
-# Erstelle eine .env.local Datei mit Supabase & Stripe Keys
+Required environment (`.env.local`):
 
-# 4. Initiate Launch Sequence
-pnpm run dev
+```env
+NEXT_PUBLIC_SUPABASE_URL=
+NEXT_PUBLIC_SUPABASE_ANON_KEY=
+SUPABASE_SERVICE_ROLE_KEY=      # server-only; never expose
+NEXT_PUBLIC_ADMIN_EMAIL=
+STRIPE_SECRET_KEY=
+STRIPE_WEBHOOK_SECRET=
+STRIPE_PRICE_ID_OPERATOR=
+NEXT_PUBLIC_BASE_URL=http://localhost:3000
+```
 
-Architect: B. Riemer
+Forward webhooks while developing:
 
-Built for: Portfolio Showcase
+```bash
+stripe listen --forward-to localhost:3000/api/stripe/webhook
+```
+
+> **Note:** the Postgres schema is not yet versioned in this repo (see *Known limitations*). You'll need to create the four tables above in a Supabase project before the app has anything to read.
+
+---
+
+## Project layout
+
+```
+src/
+├── app/
+│   ├── (marketing)/          # public landing, legal pages
+│   ├── (auth)/login/         # auth form + server actions
+│   ├── dashboard/            # user area — training, intel, settings
+│   ├── admin/                # gated by verifyAdmin() in layout.tsx
+│   └── api/stripe/           # checkout + webhook routes
+├── components/               # ui/ · dashboard/ · marketing/ · admin/
+├── lib/
+│   ├── supabase/             # client · server · admin (service-role)
+│   ├── auth/admin.ts         # verifyAdmin()
+│   └── types/                # clearance · workout · article
+└── middleware.ts             # session refresh only
+```
+
+---
+
+**Built by [Björn Riemer](https://github.com/B-Riemer)** · [b-riemer.dev](https://b-riemer.dev) · Portfolio project, Fachinformatiker AE (IHK)
