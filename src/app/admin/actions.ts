@@ -32,7 +32,7 @@ export async function createGlobalWorkout(
 
   if (!validation.success) {
     return {
-      error: validation.error.errors.map((e) => e.message).join(", "),
+      error: validation.error.issues.map((e) => e.message).join(", "),
     };
   }
 
@@ -106,7 +106,7 @@ export async function publishIntel(
 
   if (!validation.success) {
     return {
-      error: validation.error.errors.map((e) => e.message).join(", "),
+      error: validation.error.issues.map((e) => e.message).join(", "),
     };
   }
 

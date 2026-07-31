@@ -28,7 +28,7 @@ export async function createWorkout(
 
   if (!validation.success) {
     return {
-      error: validation.error.errors.map((e) => e.message).join(", "),
+      error: validation.error.issues.map((e) => e.message).join(", "),
     };
   }
 

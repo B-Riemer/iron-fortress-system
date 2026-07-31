@@ -24,7 +24,7 @@ export async function logWorkout(data: LogWorkoutInput) {
 
   if (!validation.success) {
     return {
-      error: validation.error.errors.map((e) => e.message).join(", "),
+      error: validation.error.issues.map((e) => e.message).join(", "),
     };
   }
 
