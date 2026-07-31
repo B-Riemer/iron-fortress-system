@@ -1,7 +1,8 @@
 import { cn } from "@/lib/utils";
 
 interface InputLabelProps {
-  htmlFor: string;
+  /** Omitted when the label heads a group (e.g. a radio set) rather than one input. */
+  htmlFor?: string;
   children: React.ReactNode;
   className?: string;
 }

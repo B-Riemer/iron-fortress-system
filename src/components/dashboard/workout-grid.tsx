@@ -1,6 +1,6 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { motion, type Variants } from "framer-motion";
 import { WorkoutCard } from "@/components/dashboard/workout-card";
 import type { Workout } from "@/lib/types/workout";
 
@@ -13,7 +13,7 @@ interface WorkoutGridProps {
   workouts: WorkoutWithLastRun[];
 }
 
-const containerVariants = {
+const containerVariants: Variants = {
   hidden: { opacity: 0 },
   show: {
     opacity: 1,
@@ -23,7 +23,7 @@ const containerVariants = {
   },
 };
 
-const itemVariants = {
+const itemVariants: Variants = {
   hidden: { opacity: 0, x: -20 },
   show: {
     opacity: 1,

@@ -4,10 +4,17 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 
+/**
+ * Shared state shape for the auth form. Both actions use it so the form can
+ * switch between login and signup without the state type narrowing away
+ * `message` on one branch.
+ */
+export type AuthFormState = { error?: string; message?: string } | null;
+
 export async function login(
-  prevState: { error?: string } | null,
+  prevState: AuthFormState,
   formData: FormData
-) {
+): Promise<AuthFormState> {
   const supabase = await createClient();
 
   const email = formData.get("email") as string;
@@ -37,9 +44,9 @@ export async function login(
 }
 
 export async function signup(
-  prevState: { error?: string; message?: string } | null,
+  prevState: AuthFormState,
   formData: FormData
-) {
+): Promise<AuthFormState> {
   const supabase = await createClient();
 
   const email = formData.get("email") as string;

@@ -5,9 +5,9 @@ export interface Workout {
   duration_minutes: number;
   description: string | null;
   is_global?: boolean;
-  user_id?: string;
+  user_id?: string | null;
   required_tier?: "recruit" | "operator" | "shadow" | null;
   created_at?: string;
-  updated_at?: string;
+  updated_at?: string | null;
 }
 

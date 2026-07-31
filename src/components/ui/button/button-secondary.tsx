@@ -33,9 +33,11 @@ export function ButtonSecondary({
     onClick?.(e);
   };
 
+  // Shared by the <Link> and <button> branches below, so the event element is
+  // widened to HTMLElement and narrowed back for the button-typed handler.
   const handleMouseEnter = (e: React.MouseEvent<HTMLElement>) => {
     playHover();
-    onMouseEnter?.(e);
+    onMouseEnter?.(e as React.MouseEvent<HTMLButtonElement>);
   };
 
   if (as === "link" && href) {

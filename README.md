@@ -108,28 +108,27 @@ Comparing integers (`userLevel < requiredLevel`) means adding a tier later is a 
 
 Written down because they're real, and because I'd rather discuss them than have them found.
 
-- **The tier simulator overrides the real tier.** `src/components/debug/tier-switcher.tsx` writes a client-side `simulated_tier` cookie, and `dashboard/training/page.tsx` reads it with *priority over* the database value. Anyone can set that cookie in devtools and see gated workouts. It was built as a development affordance and shipped to the demo. It should be gated behind `NODE_ENV !== "production"`, and the DB value should win.
 - **The paywall is presentational.** The training query fetches every eligible row and computes an `isLocked` flag for the UI, so the content of a locked workout is already in the payload. Real enforcement belongs in an RLS policy or a filtered query, not in a render branch.
 - **Admin is a single hard-coded email.** `verifyAdmin()` compares `user.email` against `NEXT_PUBLIC_ADMIN_EMAIL`. The check itself is server-side and sound, but the `NEXT_PUBLIC_` prefix ships the admin address in the client bundle, and there is exactly one admin. This should be a role column or a JWT claim.
 - **The webhook is not idempotent.** Stripe retries on non-2xx. There's no `event.id` ledger, so a retry re-applies the tier update. Harmless here because the update is idempotent by value, but the pattern doesn't generalise.
 - **Subscription cancellation matches on email.** If a user changes their address in Stripe or Supabase, the downgrade silently misses. The fix is to persist `stripe_customer_id` on `profiles` at checkout.
 - **Only two webhook events are handled.** `invoice.payment_failed`, `customer.subscription.updated` and `past_due` dunning states are unhandled — a failing card keeps its access.
 - **The `SHADOW` tier has no self-serve path.** Only `STRIPE_PRICE_ID_OPERATOR` exists; SHADOW is admin-assigned.
-- **`src/types/supabase.ts` is a stub, not generated.** It's a permissive `Record<string, unknown>` index signature, so Supabase queries type-check against nothing. Running `supabase gen types typescript` would surface real errors.
-- **The schema lives in the Supabase dashboard, not in the repo.** There are no versioned migrations, so this repo is not reproducible from a clean project.
+- **`src/types/supabase.ts` is hand-written, not generated.** It was previously a permissive index-signature stub that made the Supabase client resolve every table to `never` — which broke the production type check. It now mirrors the schema the app actually queries, but because it is written by hand rather than generated from the live database, it can drift from reality without anything complaining.
+- **The schema lives in the Supabase dashboard, not in the repo.** There are no versioned migrations, so this repo is not reproducible from a clean project — and that type file is the closest thing to a schema of record.
 - **No automated tests.**
 
 ---
 
 ## Roadmap
 
-- [ ] Gate `TierSwitcher` on `NODE_ENV`, and make the DB tier authoritative
+- [x] Gate `TierSwitcher` on `NODE_ENV`, and make the DB tier authoritative
 - [ ] Move the paywall into RLS so locked content never leaves Postgres
 - [ ] Persist `stripe_customer_id`; drop the email lookup
 - [ ] Add a `stripe_events` table for webhook idempotency
 - [ ] Handle `payment_failed` / `subscription.updated`
 - [ ] Replace the env-var admin with a `role` column and an RLS policy
-- [ ] Check in `supabase/migrations/` and generate real DB types
+- [ ] Check in `supabase/migrations/` and replace the hand-written DB types with generated ones
 - [ ] Playwright coverage for the signup → checkout → unlock path
 
 ---

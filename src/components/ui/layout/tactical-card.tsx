@@ -5,6 +5,7 @@ interface TacticalCardProps {
   className?: string;
   noPadding?: boolean;
   variant?: "default" | "transparent";
+  onClick?: () => void;
 }
 
 export function TacticalCard({
@@ -12,9 +13,11 @@ export function TacticalCard({
   className,
   noPadding = false,
   variant = "default",
+  onClick,
 }: TacticalCardProps) {
   return (
     <div
+      onClick={onClick}
       className={cn(
         "relative",
         variant === "transparent"
