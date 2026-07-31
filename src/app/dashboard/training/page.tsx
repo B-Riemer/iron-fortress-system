@@ -22,10 +22,6 @@ export default async function TrainingPage() {
     );
   }
 
-  // Read simulated tier from cookie (for testing)
-  const cookieStore = await cookies();
-  const cookieSimulatedTier = cookieStore.get("simulated_tier")?.value;
-
   // Fetch real tier from profiles table
   let dbProfileTier: "recruit" | "operator" | "shadow" | null = null;
   const { data: profile, error: profileError } = await supabase
@@ -38,7 +34,16 @@ export default async function TrainingPage() {
     dbProfileTier = profile.tier as "recruit" | "operator" | "shadow" | null;
   }
 
-  // Priority: Simulator > DB Profile > Default to 'recruit'
+  // The simulated_tier cookie is a development affordance for the TierSwitcher.
+  // It is client-writable, so it must never be trusted in production — otherwise
+  // anyone could grant themselves paid access from devtools.
+  let cookieSimulatedTier: string | undefined;
+  if (process.env.NODE_ENV !== "production") {
+    const cookieStore = await cookies();
+    cookieSimulatedTier = cookieStore.get("simulated_tier")?.value;
+  }
+
+  // The database is the source of truth. In development the simulator may override it.
   const effectiveTier = cookieSimulatedTier || dbProfileTier || "recruit";
 
   // Define tier values

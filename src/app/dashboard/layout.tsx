@@ -27,7 +27,8 @@ export default function DashboardLayout({
         </main>
       </div>
       <Scanline />
-      <TierSwitcher />
+      {/* Development-only: the tier it simulates is ignored in production. */}
+      {process.env.NODE_ENV !== "production" && <TierSwitcher />}
     </div>
   );
 }
